@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Azure Pipelines Agent (upstream)
+    url: https://github.com/microsoft/azure-pipelines-agent/issues
+    about: For bugs in the agent itself (not this packaging), report to Microsoft.
+  - name: Question / discussion
+    url: ../../discussions
+    about: Ask questions and discuss usage here.

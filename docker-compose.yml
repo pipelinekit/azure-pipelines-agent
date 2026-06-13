@@ -1,0 +1,25 @@
+# Example Compose file for running one or more Azure Pipelines agents.
+#
+# 1. Copy .env.example to .env and fill in your values.
+# 2. Run:  docker compose up -d
+# 3. Scale: docker compose up -d --scale agent=3
+#
+# Build locally instead of pulling by uncommenting the `build` block.
+
+services:
+  agent:
+    image: ghcr.io/pipelinekit/azure-pipelines-agent:latest
+    # build:
+    #   context: .
+    #   args:
+    #     AZP_AGENT_VERSION: ""   # blank = latest release
+    restart: unless-stopped
+    environment:
+      AZP_URL: ${AZP_URL:?set AZP_URL in .env}
+      AZP_TOKEN: ${AZP_TOKEN:?set AZP_TOKEN in .env}
+      AZP_POOL: ${AZP_POOL:-Default}
+      AZP_WORK: ${AZP_WORK:-_work}
+      # AZP_AGENT_NAME is intentionally unset so each replica gets a unique name.
+    # Required only if your pipelines build Docker images ("Docker-in-Docker").
+    # volumes:
+    #   - /var/run/docker.sock:/var/run/docker.sock

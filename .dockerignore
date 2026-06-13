@@ -1,0 +1,11 @@
+.git
+.github
+*.md
+!start.sh
+LICENSE
+docker-compose.yml
+install.sh
+uninstall.sh
+_work
+.env
+*.log

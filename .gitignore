@@ -1,0 +1,18 @@
+# Agent runtime
+_work/
+_diag/
+.agent
+.credentials
+.credentials_rsaparams
+.env
+*.log
+
+# Downloaded agent packages
+*.tar.gz
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
