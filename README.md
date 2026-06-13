@@ -52,7 +52,25 @@ docker compose up -d --scale agent=3   # run 3 agents
 
 ### Option C — Native Linux install (systemd)
 
+**One-line install with `curl`** (no clone needed):
+
 ```bash
+curl -fsSL https://raw.githubusercontent.com/pipelinekit/azure-pipelines-agent/main/install.sh \
+  | sudo sh -s -- \
+      --url   https://dev.azure.com/your-org \
+      --token <your-pat> \
+      --pool  Default
+```
+
+> The scripts are POSIX `sh` (no bash required). Piping to `sudo sh` runs a
+> remote script as root — inspect it first if you prefer:
+> `curl -fsSL .../install.sh | less`, or clone and run it manually below.
+
+**Or from a clone:**
+
+```bash
+git clone https://github.com/pipelinekit/azure-pipelines-agent.git
+cd azure-pipelines-agent
 sudo ./install.sh \
   --url   https://dev.azure.com/your-org \
   --token <your-pat> \
@@ -71,7 +89,8 @@ sudo ./svc.sh start
 Uninstall (also unregisters the agent from the pool):
 
 ```bash
-sudo ./uninstall.sh --token <your-pat>
+curl -fsSL https://raw.githubusercontent.com/pipelinekit/azure-pipelines-agent/main/uninstall.sh \
+  | sudo sh -s -- --token <your-pat>
 ```
 
 ---

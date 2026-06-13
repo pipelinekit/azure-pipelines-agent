@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 # ===========================================================================
 # Azure Pipelines Agent — native Linux uninstaller
@@ -56,7 +56,7 @@ log "Stopping and uninstalling service..."
 
 if [ -n "$AZP_TOKEN" ] && [ -f "${INSTALL_DIR}/config.sh" ]; then
     log "Unregistering agent from Azure DevOps..."
-    sudo -u "$RUN_USER" -- bash -c "cd '$INSTALL_DIR' && ./config.sh remove \
+    sudo -u "$RUN_USER" -- sh -c "cd '$INSTALL_DIR' && ./config.sh remove \
         --unattended --auth PAT --token '$AZP_TOKEN'" \
         || warn "could not unregister agent (remove it manually from the pool)"
 else

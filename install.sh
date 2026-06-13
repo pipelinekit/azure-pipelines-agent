@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 # ===========================================================================
 # Azure Pipelines Agent — native Linux installer
@@ -98,14 +98,18 @@ esac
 # ----------------------------- resolve version -----------------------------
 if [ -z "$AZP_AGENT_VERSION" ]; then
     log "Resolving latest agent version from GitHub..."
+    # Capture the response first so a curl failure isn't masked by the pipe
+    # (POSIX sh has no `pipefail`).
+    release_json="$(curl -fsSL "$GITHUB_API")" || die "could not reach the GitHub API"
     if command -v jq >/dev/null 2>&1; then
-        AZP_AGENT_VERSION="$(curl -fsSL "$GITHUB_API" | jq -r '.tag_name' | sed 's/^v//')"
+        AZP_AGENT_VERSION="$(printf '%s' "$release_json" | jq -r '.tag_name' | sed 's/^v//')"
     else
-        AZP_AGENT_VERSION="$(curl -fsSL "$GITHUB_API" \
+        AZP_AGENT_VERSION="$(printf '%s' "$release_json" \
             | grep -m1 '"tag_name"' \
             | sed -E 's/.*"v?([^"]+)".*/\1/')"
     fi
-    [ -n "$AZP_AGENT_VERSION" ] || die "could not resolve latest agent version"
+    [ -n "$AZP_AGENT_VERSION" ] && [ "$AZP_AGENT_VERSION" != "null" ] \
+        || die "could not resolve latest agent version"
 fi
 log "Agent version: ${AZP_AGENT_VERSION} (${AZP_ARCH})"
 
@@ -124,10 +128,8 @@ TMP_TARBALL="$(mktemp)"
 trap 'rm -f "$TMP_TARBALL"' EXIT
 
 log "Downloading ${PACKAGE}"
-curl -fsSL -o "$TMP_TARBALL" \
+curl -fsSL --retry 5 --retry-delay 5 -o "$TMP_TARBALL" \
     "https://download.agent.dev.azure.com/agent/${AZP_AGENT_VERSION}/${PACKAGE}" \
-    || curl -fsSL -o "$TMP_TARBALL" \
-    "https://vstsagentpackage.azureedge.net/agent/${AZP_AGENT_VERSION}/${PACKAGE}" \
     || die "failed to download agent package"
 
 tar -xzf "$TMP_TARBALL" -C "$INSTALL_DIR"
@@ -141,7 +143,7 @@ fi
 
 # ----------------------------- configure -----------------------------------
 log "Configuring agent '${AZP_AGENT_NAME}' in pool '${AZP_POOL}'..."
-sudo -u "$RUN_USER" -- bash -c "cd '$INSTALL_DIR' && ./config.sh \
+sudo -u "$RUN_USER" -- sh -c "cd '$INSTALL_DIR' && ./config.sh \
     --unattended \
     --agent '$AZP_AGENT_NAME' \
     --url '$AZP_URL' \

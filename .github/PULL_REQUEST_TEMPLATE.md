@@ -13,7 +13,7 @@ Fixes #<!-- issue number, if applicable -->
 
 ## Checklist
 
-- [ ] `shellcheck start.sh install.sh uninstall.sh` passes
+- [ ] `shellcheck -s sh start.sh install.sh uninstall.sh` passes (POSIX, no bashisms)
 - [ ] `hadolint Dockerfile` passes
 - [ ] The image builds (`docker build .`)
 - [ ] I updated the README / docs where relevant

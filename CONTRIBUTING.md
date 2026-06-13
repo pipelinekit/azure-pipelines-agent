@@ -19,7 +19,7 @@ You only need Docker (with Buildx) and a POSIX shell.
 docker build -t azp-agent:dev .
 
 # Lint shell scripts
-shellcheck start.sh install.sh uninstall.sh
+shellcheck -s sh start.sh install.sh uninstall.sh
 
 # Lint the Dockerfile
 docker run --rm -i hadolint/hadolint < Dockerfile
@@ -41,8 +41,9 @@ pull request, so please run them locally first.
 
 ## Coding style
 
-- **Shell:** `bash`, `set -euo pipefail`, quote your variables, prefer `printf`
-  over `echo` for messages, keep functions small.
+- **Shell:** POSIX `sh` (no bashisms — must pass `dash -n` and `shellcheck -s sh`),
+  `set -eu`, quote your variables, prefer `printf` over `echo`, keep functions
+  small. The scripts must run via `curl ... | sh`.
 - **Dockerfile:** minimize layers, clean up apt caches, pin where it makes sense.
 - Match the style of the surrounding code.
 

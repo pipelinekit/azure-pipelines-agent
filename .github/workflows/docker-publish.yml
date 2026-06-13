@@ -3,7 +3,15 @@ name: Build and Publish Docker Image
 on:
   push:
     branches: [main]
-    tags: ["v*.*.*"]
+    # Only rebuild when something that actually affects the image changes.
+    paths:
+      - "Dockerfile"
+      - "start.sh"
+      - ".dockerignore"
+      - ".github/workflows/docker-publish.yml"
+  release:
+    # Publishing a release (tag vX.Y.Z) always builds, regardless of paths.
+    types: [published]
   schedule:
     # Rebuild weekly to pick up the latest agent + base image patches.
     - cron: "0 6 * * 1"

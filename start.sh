@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 # ---------------------------------------------------------------------------
 # Entrypoint for the Azure Pipelines containerized agent.
@@ -50,7 +50,7 @@ cleanup() {
 }
 
 print_header() {
-    echo -e "\n\033[1;36m$1\033[0m\n"
+    printf '\n\033[1;36m%s\033[0m\n\n' "$1"
 }
 
 # Let the agent know we will manage its lifecycle.
