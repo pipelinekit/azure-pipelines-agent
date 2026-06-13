@@ -8,10 +8,10 @@
 ARG UBUNTU_VERSION=22.04
 FROM ubuntu:${UBUNTU_VERSION}
 
-# Pinned agent version. Override at build time:
-#   docker build --build-arg AZP_AGENT_VERSION=4.255.0 .
-# Leave empty to resolve the latest release at build time.
-ARG AZP_AGENT_VERSION=""
+# Pinned agent version (reproducible builds). Override at build time:
+#   docker build --build-arg AZP_AGENT_VERSION=4.274.1 .
+# Set to "latest" to resolve the newest release from the GitHub API instead.
+ARG AZP_AGENT_VERSION=4.274.1
 ARG TARGETARCH=amd64
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -54,15 +54,16 @@ RUN set -eux; \
         arm)   AZP_ARCH="arm" ;; \
         *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
     esac; \
-    if [ -z "${AZP_AGENT_VERSION}" ]; then \
+    if [ -z "${AZP_AGENT_VERSION}" ] || [ "${AZP_AGENT_VERSION}" = "latest" ]; then \
         AZP_AGENT_VERSION="$(curl -fsSL https://api.github.com/repos/microsoft/azure-pipelines-agent/releases/latest | jq -r '.tag_name' | sed 's/^v//')"; \
+    fi; \
+    if [ -z "${AZP_AGENT_VERSION}" ] || [ "${AZP_AGENT_VERSION}" = "null" ]; then \
+        echo "Could not determine agent version" >&2; exit 1; \
     fi; \
     echo "Installing agent version ${AZP_AGENT_VERSION} (${AZP_ARCH})"; \
     AZP_PACKAGE="vsts-agent-linux-${AZP_ARCH}-${AZP_AGENT_VERSION}.tar.gz"; \
-    curl -fsSL -o /tmp/agent.tar.gz \
-        "https://download.agent.dev.azure.com/agent/${AZP_AGENT_VERSION}/${AZP_PACKAGE}" \
-        || curl -fsSL -o /tmp/agent.tar.gz \
-        "https://vstsagentpackage.azureedge.net/agent/${AZP_AGENT_VERSION}/${AZP_PACKAGE}"; \
+    curl -fsSL --retry 5 --retry-delay 5 -o /tmp/agent.tar.gz \
+        "https://download.agent.dev.azure.com/agent/${AZP_AGENT_VERSION}/${AZP_PACKAGE}"; \
     tar -xzf /tmp/agent.tar.gz -C /azp; \
     rm -f /tmp/agent.tar.gz; \
     chown -R agent:agent /azp

@@ -35,7 +35,7 @@ body:
     id: image-tag
     attributes:
       label: Image tag / agent version
-      placeholder: "ghcr.io/pipelinekit/azure-pipelines-agent:latest or agent 4.255.0"
+      placeholder: "ghcr.io/pipelinekit/azure-pipelines-agent:latest or agent 4.274.1"
     validations:
       required: true
   - type: dropdown

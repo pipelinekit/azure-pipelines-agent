@@ -111,11 +111,14 @@ All entrypoint behavior is driven by environment variables.
 ## Building locally
 
 ```bash
-# Latest agent release
+# Pinned default agent version (reproducible)
 docker build -t azp-agent:local .
 
 # Pin a specific agent version
-docker build --build-arg AZP_AGENT_VERSION=4.255.0 -t azp-agent:local .
+docker build --build-arg AZP_AGENT_VERSION=4.274.1 -t azp-agent:local .
+
+# Resolve the newest release at build time
+docker build --build-arg AZP_AGENT_VERSION=latest -t azp-agent:local .
 ```
 
 ---
